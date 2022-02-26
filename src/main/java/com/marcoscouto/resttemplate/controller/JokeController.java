@@ -29,7 +29,7 @@ public class JokeController {
         return resolve(() -> template.getForEntity(baseUrl, ChuckNorrisJoke.class));
     }
 
-    private <T> ResponseEntity<T> resolve(Callable<ResponseEntity> callable) {
+    private ResponseEntity resolve(Callable<ResponseEntity> callable) {
         try {
             return callable.call();
         } catch (Exception e) {
