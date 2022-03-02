@@ -2,6 +2,7 @@ package com.marcoscouto.resttemplate.client;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -18,9 +19,26 @@ public class RestTemplateClient {
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {
         int timeout = 3000;
-        var config = RequestConfig.custom().setConnectTimeout(timeout).setConnectionRequestTimeout(timeout).setSocketTimeout(timeout).build();
-        var client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+
+        var config = RequestConfig.custom()
+                .setConnectTimeout(timeout)
+                .setConnectionRequestTimeout(timeout)
+                .setSocketTimeout(timeout)
+                .build();
+
+        var client = HttpClientBuilder.create()
+                .setDefaultRequestConfig(config)
+                .setConnectionManager(poolingConfig())
+                .build();
+
         return new HttpComponentsClientHttpRequestFactory(client);
+    }
+
+    private PoolingHttpClientConnectionManager poolingConfig(){
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(100);
+        connectionManager.setDefaultMaxPerRoute(20);
+        return connectionManager;
     }
 
 }
